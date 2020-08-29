@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>ToDoList—最简单的待办事件</title>
+    <style>
+        body{
+            width: 100%;
+        }
+        #app{
+            height: 500px;
+            width: 800px;
+            margin: 0 auto;
+            background-color: #ccc;
+        }
+        .header{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 50px;
+            background-color: rgb(47, 47, 47, 0.98);
+            color: #DDD;
+            font-size: 24px;
+            line-height: 50px;
+            cursor: pointer;
+        }
+        .header input{
+            /* margin-right: 30px; */
+            float: right;
+            width: 50%;
+            height: 24px;
+            margin-top: 12px;
+            text-indent: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.24), 0 1px 6px rgba(0,0,0,0.45) inset;
+            border: none;
+        }
+        .check{
+            float: left;
+        }
+        .box{
+            height: 32px;
+            width: 600px;
+            background-color: #fff;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            ToDoList
+            <input v-model="str" @keyup.13="add" />
+        </div>
+        
+        <ul>
+            <h2>正在进行</h2>
+            <li v-for="item in todos" v-if="item.done===false" class="box">
+                {{item.text}}
+                <input type="checkbox" @click="done(item)" class="check">已完成</input>
+                <button @click="del(item)">删除</button>
+            </li>
+        </ul>
+        <ul>
+            <h2>已完成的事项</h2>
+            <li v-for="item in todos" v-if="item.done===true" class="box">
+                {{item.text}}
+                <input type="checkbox" @click="doing(item)" class="check">未完成</input>
+                <button @click="del(item)">删除</button>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>   
+
+<script>
+var app = new Vue({
+    el : '#app',
+    data : {
+        str : '',
+        todos : JSON.parse(localStorage.getItem('todos') || '[]')
+    },
+    methods : {
+        add(){
+            this.todos.push({"id":new Date().getTime(), "text":this.str, "done":false});
+            this.save();
+        },
+        done(item){
+            var ind = this.todos.findIndex(obj=>obj.id===item.id);
+            this.todos[ind].done = true;
+            this.save();
+        },
+        doing(item){
+            var ind = this.todos.findIndex(obj=>obj.id===item.id);
+            this.todos[ind].done = false;
+            this.save();
+        },
+        del(item){
+            var ind = this.todos.findIndex(obj=>obj.id===item.id);
+            this.todos.splice(ind, 1);
+            this.save();
+        },
+        save(){
+            // 持久化数据
+            localStorage.setItem('todos', JSON.stringify(this.todos));
+        }
+    }
+})
+</script>
